@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "multy-acc-gmail-mcp": {
+      "command": "/Users/eduard/IdeaProjects/multy-acc-gmail-mcp/.venv/bin/python",
+      "args": ["-m", "multy_acc_gmail_mcp", "serve"]
+    }
+  }
+}
