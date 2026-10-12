@@ -1,8 +1,12 @@
-# Multi-account Gmail MCP
+# Multi-account Gmail MCP server
 
-A local Gmail MCP server for searching and managing drafts across multiple Google Workspace accounts
-from an AI assistant. Connect your mailboxes once, then search inboxes, read email threads, and download
-attachments through an MCP client on your Mac.
+A local Gmail MCP server for AI assistants such as Claude Desktop, Claude Code, and Cursor.
+Search multiple Gmail inboxes, read email threads, download attachments, and create reply drafts across
+Google Workspace accounts from your Mac. Connect your mailboxes once, then use natural-language
+requests through an MCP client.
+
+Looking for a Gmail MCP integration for ChatGPT? See [ChatGPT connection requirements](#chatgpt-connection-requirements)
+for the additional connection setup needed for this local server.
 
 The package and command are named `multy-acc-gmail-mcp`. Built with Google's official Gmail API client
 and the official Model Context Protocol (MCP) Python SDK.
@@ -160,6 +164,53 @@ uv run --locked multy-acc-gmail-mcp serve
 ```
 
 This speaks MCP on stdin/stdout, not a human CLI. Diagnostics go to stderr.
+
+### Connect Gmail to Claude Desktop
+
+After authorizing your mailboxes, run the `mcp-config` command above. Merge its
+`multy-acc-gmail-mcp` entry into the `mcpServers` object in:
+
+```text
+~/Library/Application Support/Claude/claude_desktop_config.json
+```
+
+If the file does not exist, open Claude Desktop once to initialize its configuration directory, then
+create the file with the generated JSON. Preserve any existing server entries. Fully quit and reopen
+Claude Desktop, then ask it to list your connected Gmail accounts before searching or creating drafts.
+
+### Connect Gmail to Claude Code
+
+Register the server using the absolute Python path returned by `mcp-config`:
+
+```sh
+claude mcp add multy-acc-gmail-mcp -- /absolute/path/to/multi-account-gmail-mcp/.venv/bin/python -m multy_acc_gmail_mcp serve
+```
+
+Replace the placeholder path with your installation's path. Run `/mcp` inside Claude Code to check the
+connection and available tools, then ask it to list your connected accounts.
+
+### Connect Gmail to Cursor
+
+Merge the generated `mcpServers` entry into your project's `.cursor/mcp.json`. Use the absolute Python
+path from `mcp-config`, reload the client as needed, and check Cursor's MCP settings for the server and
+its tools before trying the example requests.
+
+These instructions follow the clients' local stdio configuration formats; they are not a claim of
+end-to-end testing in every client. See the [MCP SDK's client setup guide](https://py.sdk.modelcontextprotocol.io/get-started/real-host/)
+for configuration details.
+
+### ChatGPT connection requirements
+
+ChatGPT's custom MCP connection requires a reachable HTTPS MCP endpoint or OpenAI's Secure MCP Tunnel.
+The generated `mcpServers` JSON above configures a local stdio client; it cannot be pasted directly into
+ChatGPT as a server connection.
+
+This project provides a local stdio server. Connecting it to ChatGPT requires additional infrastructure,
+such as Secure MCP Tunnel configured to launch the generated Python command, plus the necessary
+account and workspace access. This repository does not include or test that integration. Follow
+[OpenAI's ChatGPT connection guide](https://developers.openai.com/plugins/deploy/connect-chatgpt)
+and [Secure MCP Tunnel setup](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels)
+for current requirements.
 
 ## Tools
 
